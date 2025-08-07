@@ -1,0 +1,50 @@
+.home {
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+}
+
+/* Light theme */
+[data-theme="light"] .home {
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #e9ecef 100%);
+}
+
+/* Ensure each MovieList section has proper spacing */
+.home .movie_list {
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.home .movie_list:last-child {
+  margin-bottom: 0;
+}
+
+/* Add container padding for better spacing */
+.home-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .home {
+    padding: 1rem 0;
+  }
+  
+  .home .movie_list {
+    margin-bottom: 2rem;
+  }
+
+   .home-container {
+        padding: 0 0.5rem;
+    }
+
+}
+
+@media (max-width: 480px) {
+  .home .movie_list {
+    margin-bottom: 1.5rem;
+  }
+}

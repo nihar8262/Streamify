@@ -1,0 +1,76 @@
+@font-face {
+    font-family: "Montserrat";
+    src: url("./assets/fonts/Montserrat.woff2");
+}
+
+.app {
+    display: grid;
+    grid-template-rows: 80px auto;
+}
+
+
+
+:root {
+  /* Dark theme (default) */
+  --bg-color: #0f0f23;
+  --text-color: #ffffff;
+  --navbar-bg: #1a1a2e;
+  --search-bg: rgba(255, 255, 255, 0.1);
+  --search-border: rgba(255, 255, 255, 0.2);
+  --search-text: #ffffff;
+  --search-placeholder: rgba(255, 255, 255, 0.7);
+  --search-button-color: rgba(255, 255, 255, 0.8);
+  --search-button-hover-bg: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] {
+  /* Light theme */
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --navbar-bg-light: #ffffff;
+  --text-color-light: #333333;
+  --search-bg-light: rgba(0, 0, 0, 0.05);
+  --search-border-light: rgba(0, 0, 0, 0.1);
+  --search-text-light: #333333;
+  --search-placeholder-light: rgba(0, 0, 0, 0.5);
+  --search-button-color-light: rgba(0, 0, 0, 0.6);
+  --search-button-hover-bg-light: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000000;
+  color: white;
+  overflow-x: hidden;
+}
+
+[data-theme="light"] body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.home-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.movie_list {
+  position: relative !important;
+  float: none !important;
+  clear: both;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+.align_center {
+    display: flex;
+    align-items: center;
+}
