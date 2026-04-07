@@ -200,7 +200,7 @@
     }
 
         .back-button {
-            top: 1rem;
+            top: 3rem;
             left: 1rem;
             padding: 0.65rem 1rem;
         }
@@ -258,7 +258,7 @@
 
 .back-button {
   position: fixed;
-  top: 2rem;
+  top: 4rem;
   left: 2rem;
   background: rgba(0, 0, 0, 0.5);
   color: white;

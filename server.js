@@ -60,6 +60,48 @@ app.get('/api/movies/top-grossing', async (req, res) => {
   }
 });
 
+app.get('/api/movies/by-type', async (req, res) => {
+  const { type } = req.query;
+
+  if (!allowedMovieTypes.has(type)) {
+    res.status(400).json({ error: 'Unsupported movie type.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/movie/${type}`, {
+    page: req.query.page || 1,
+  });
+});
+
+app.get('/api/movie/details', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Movie id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/movie/${req.query.id}`);
+});
+
+app.get('/api/movie/videos', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Movie id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/movie/${req.query.id}/videos`);
+});
+
+app.get('/api/movie/similar', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Movie id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/movie/${req.query.id}/similar`, {
+    page: req.query.page || 1,
+  });
+});
+
 app.get('/api/movies/:type', async (req, res) => {
   const { type } = req.params;
 

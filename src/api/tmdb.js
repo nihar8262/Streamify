@@ -31,15 +31,15 @@ const request = async (path, params = {}) => {
   return response.json();
 };
 
-export const fetchMoviesByType = (type, page = 1) => request(`/movies/${type}`, { page });
+export const fetchMoviesByType = (type, page = 1) => request('/movies/by-type', { type, page });
 
 export const fetchTopGrossingMovies = (year) => request('/movies/top-grossing', { year });
 
-export const fetchMovieDetails = (id) => request(`/movie/${id}`);
+export const fetchMovieDetails = (id) => request('/movie/details', { id });
 
-export const fetchMovieVideos = (id) => request(`/movie/${id}/videos`);
+export const fetchMovieVideos = (id) => request('/movie/videos', { id });
 
-export const fetchSimilarMovies = (id, page = 1) => request(`/movie/${id}/similar`, { page });
+export const fetchSimilarMovies = (id, page = 1) => request('/movie/similar', { id, page });
 
 export const fetchGenres = () => request('/genres');
 
