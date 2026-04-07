@@ -1,5 +1,5 @@
 .movie_list {
-  padding: 2rem;
+  padding: 1.5rem clamp(0.75rem, 3vw, 2rem);
   margin-bottom: 2rem;
   position: relative;
   overflow: visible;
@@ -44,7 +44,7 @@
 
 .movie_cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1.5rem;
   padding: 0;
   margin: 0;
@@ -138,13 +138,18 @@
     align-items: flex-start;
     gap: 1rem;
   }
+
+  .movie_list_fs {
+    width: 100%;
+    justify-content: flex-start;
+  }
   
   .movie_list_heading {
     font-size: 1.5rem;
   }
   
   .movie_cards {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -157,8 +162,17 @@
     font-size: 1.25rem;
   }
   
+  .movie_list_fs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .movie_sorting {
+    width: 100%;
+  }
+
   .movie_cards {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
   }
 }

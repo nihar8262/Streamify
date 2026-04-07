@@ -1,9 +1,16 @@
 .search-results-container {
     min-height: 100vh;
-    padding: 2rem;
+    display: flow-root;
+    padding: 0 0 2rem;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     color: white;
     transition: all 0.3s ease;
+}
+
+.search-results-content {
+    width: min(1200px, calc(100% - 2rem));
+    margin: 0 auto;
+    padding-top: 1.5rem;
 }
 [data-theme="light"] .search-results-container {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
@@ -39,6 +46,7 @@
     gap: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
+    position: relative;
 }
 
 .search-movie-card {
@@ -190,6 +198,12 @@
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
         gap: 1rem;
     }
+
+        .back-button {
+            top: 1rem;
+            left: 1rem;
+            padding: 0.65rem 1rem;
+        }
     
     .search-movie-poster {
         height: 300px;
@@ -197,13 +211,26 @@
 }
 
 @media (max-width: 480px) {
+        .search-results-container {
+            padding-bottom: 1rem;
+        }
+
+        .search-results-content {
+            width: calc(100% - 1rem);
+            padding-top: 1rem;
+        }
+
+        .search-header {
+            padding-top: 1.5rem;
+        }
+
     .search-results-grid {
         grid-template-columns: 1fr;
     }
     
     .search-movie-card {
         flex-direction: row;
-        height: 200px;
+        min-height: 200px;
     }
     
     .search-movie-poster {
@@ -213,11 +240,20 @@
     
     .search-movie-info {
         padding: 0.75rem;
+        min-width: 0;
     }
     
     .search-movie-title {
         font-size: 1rem;
     }
+
+        .back-button {
+            position: fixed;
+            top: 0.75rem;
+            left: 0.75rem;
+            padding: 0.55rem 0.9rem;
+            font-size: 0.85rem;
+        }
 }
 
 .back-button {

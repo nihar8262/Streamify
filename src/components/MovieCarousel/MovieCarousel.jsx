@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MovieCarousel.css';
-
-const API_KEY = '183928bab7fc630ed0449e4f66ec21bd';
+import { fetchMoviesByType } from '../../api/tmdb';
 
 const MovieCarousel = () => {
   const [upcomingMovies, setUpcomingMovies] = useState([]);
@@ -31,19 +30,7 @@ const MovieCarousel = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      console.log('Fetching upcoming movies...');
-      
-      const response = await fetch(
-        `https://api.themoviedb.org/3/movie/upcoming?api_key=${API_KEY}&page=1`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      console.log('API Response:', data);
+      const data = await fetchMoviesByType('upcoming', 1);
       
       if (data.results && data.results.length > 0) {
         setUpcomingMovies(data.results.slice(0, 16));

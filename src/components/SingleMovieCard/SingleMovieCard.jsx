@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import './SingleMovieCard.css'
-
-const API_KEY = '183928bab7fc630ed0449e4f66ec21bd';
+import {
+  discoverMovies,
+  fetchMovieDetails,
+  fetchSimilarMovies,
+  fetchMovieVideos,
+  searchMovies,
+} from '../../api/tmdb';
 
 const SingleMovieCard = () => {
   const { id } = useParams(); 
   const navigate = useNavigate();
-  const location = useLocation();
   const [movieData, setMovieData] = useState(null);
   const [relatedMovies, setRelatedMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,21 +19,23 @@ const SingleMovieCard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMoreMovies, setHasMoreMovies] = useState(true);
+  const [trailer, setTrailer] = useState(null);
 
   useEffect(() => {
     const fetchMovieData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}`);
-        const data = await response.json();
-        
-        console.log('Movie Data:', data);
-        console.log('Title:', data.title);
-        console.log('Overview:', data.overview);
-        console.log('Release Date:', data.release_date);
-        console.log('Rating:', data.vote_average);
-        
+        const data = await fetchMovieDetails(id);
         setMovieData(data);
+
+        try {
+          const videosData = await fetchMovieVideos(id);
+          console.log('Trailer API Response:', videosData);
+          setTrailer(selectTrailer(videosData.results || []));
+        } catch (videoError) {
+          console.error('Error fetching movie trailer:', videoError);
+          setTrailer(null);
+        }
       } catch (error) {
         console.error('Error fetching movie data:', error);
         setError(error.message);
@@ -62,6 +68,15 @@ const SingleMovieCard = () => {
     }
   }, [id, movieData]);
 
+  const selectTrailer = (videos) => {
+    const youtubeVideos = videos.filter((video) => video.site === 'YouTube');
+    const preferredTrailer = youtubeVideos.find((video) => video.type === 'Trailer' && video.official);
+    const trailerVideo = youtubeVideos.find((video) => video.type === 'Trailer');
+    const teaserVideo = youtubeVideos.find((video) => video.type === 'Teaser');
+
+    return preferredTrailer || trailerVideo || teaserVideo || youtubeVideos[0] || null;
+  };
+
   const fetchSimilarMoviesByNameAndGenre = async () => {
     try {
       let allSimilarMovies = [];
@@ -81,10 +96,7 @@ const SingleMovieCard = () => {
         // Search for movies with similar titles
         for (const word of titleWords.slice(0, 3)) { // Use first 3 significant words
           try {
-            const searchResponse = await fetch(
-              `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(word)}&page=1`
-            );
-            const searchData = await searchResponse.json();
+            const searchData = await searchMovies(word, 1);
             
             if (searchData.results) {
               // Filter movies that share title words and are not the current movie
@@ -103,10 +115,11 @@ const SingleMovieCard = () => {
       // Then, get movies by genre
       if (movieData.genres && movieData.genres.length > 0) {
         const genreIds = movieData.genres.map(genre => genre.id).join(',');
-        const genreResponse = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreIds}&sort_by=popularity.desc&page=1`
-        );
-        const genreData = await genreResponse.json();
+        const genreData = await discoverMovies({
+          with_genres: genreIds,
+          sort_by: 'popularity.desc',
+          page: 1,
+        });
         
         if (genreData.results) {
           allSimilarMovies = [...allSimilarMovies, ...genreData.results];
@@ -116,10 +129,11 @@ const SingleMovieCard = () => {
       // Then, get movies by production company
       if (movieData.production_companies && movieData.production_companies.length > 0) {
         const companyIds = movieData.production_companies.map(company => company.id).join(',');
-        const companyResponse = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_companies=${companyIds}&sort_by=popularity.desc&page=1`
-        );
-        const companyData = await companyResponse.json();
+        const companyData = await discoverMovies({
+          with_companies: companyIds,
+          sort_by: 'popularity.desc',
+          page: 1,
+        });
         
         if (companyData.results) {
           allSimilarMovies = [...allSimilarMovies, ...companyData.results];
@@ -155,10 +169,7 @@ const SingleMovieCard = () => {
       
       // Fallback to regular similar movies API
       try {
-        const fallbackResponse = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}/similar?api_key=${API_KEY}&page=1`
-        );
-        const fallbackData = await fallbackResponse.json();
+        const fallbackData = await fetchSimilarMovies(id, 1);
         return fallbackData.results?.filter(movie => movie.id !== parseInt(id)).slice(0, 10) || [];
       } catch (fallbackError) {
         console.error('Fallback similar movies failed:', fallbackError);
@@ -214,10 +225,11 @@ const SingleMovieCard = () => {
       // Get more movies by genre
       if (movieData.genres && movieData.genres.length > 0) {
         const genreIds = movieData.genres.map(genre => genre.id).join(',');
-        const genreResponse = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_genres=${genreIds}&sort_by=popularity.desc&page=${page}`
-        );
-        const genreData = await genreResponse.json();
+        const genreData = await discoverMovies({
+          with_genres: genreIds,
+          sort_by: 'popularity.desc',
+          page,
+        });
         
         if (genreData.results) {
           allSimilarMovies = [...allSimilarMovies, ...genreData.results];
@@ -227,10 +239,11 @@ const SingleMovieCard = () => {
       // Get more movies by production company
       if (movieData.production_companies && movieData.production_companies.length > 0) {
         const companyIds = movieData.production_companies.map(company => company.id).join(',');
-        const companyResponse = await fetch(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&with_companies=${companyIds}&sort_by=popularity.desc&page=${page}`
-        );
-        const companyData = await companyResponse.json();
+        const companyData = await discoverMovies({
+          with_companies: companyIds,
+          sort_by: 'popularity.desc',
+          page,
+        });
         
         if (companyData.results) {
           allSimilarMovies = [...allSimilarMovies, ...companyData.results];
@@ -282,6 +295,20 @@ const SingleMovieCard = () => {
     }
     return 'N/A';
   };
+
+  const formatYear = (dateString) => {
+    if (!dateString) return 'TBA';
+
+    const year = new Date(dateString).getFullYear();
+    return Number.isNaN(year) ? 'TBA' : year;
+  };
+
+  const formatRating = (rating) => {
+    return Number.isFinite(rating) ? rating.toFixed(1) : 'N/A';
+  };
+
+  const trailerWatchUrl = trailer?.key ? `https://www.youtube.com/watch?v=${trailer.key}` : null;
+  const trailerEmbedUrl = trailer?.key ? `https://www.youtube.com/embed/${trailer.key}` : null;
 
   if (loading) return (
     <div className="loading-container">
@@ -351,11 +378,11 @@ const SingleMovieCard = () => {
           <div className="movie-meta">
             <span className="release-date">
               <i className="icon">📅</i>
-              {new Date(movieData.release_date).getFullYear()}
+              {formatYear(movieData.release_date)}
             </span>
             <span className="rating">
               <i className="icon">⭐</i>
-              {movieData.vote_average?.toFixed(1)}/10
+              {formatRating(movieData.vote_average)}/10
             </span>
             <span className="runtime">
               <i className="icon">⏱️</i>
@@ -386,6 +413,17 @@ const SingleMovieCard = () => {
 
           {/* Movie Actions */}
           <div className="movie-actions">
+            {trailerWatchUrl && (
+              <a
+                href={trailerWatchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="trailer-button"
+              >
+                <i className="icon">▶</i>
+                Watch Trailer
+              </a>
+            )}
             {movieData.homepage && (
               <a 
                 href={movieData.homepage} 
@@ -398,6 +436,21 @@ const SingleMovieCard = () => {
               </a>
             )}
           </div>
+
+          {trailerEmbedUrl && (
+            <div className="trailer-section">
+              <h3>Trailer</h3>
+              <div className="trailer-frame-wrap">
+                <iframe
+                  className="trailer-frame"
+                  src={trailerEmbedUrl}
+                  title={`${movieData.title} trailer`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          )}
           
           {movieData.production_companies && movieData.production_companies.length > 0 && (
             <div className="production-info">
@@ -443,10 +496,10 @@ const SingleMovieCard = () => {
                     <h4 className="related-movie-title">{movie.title}</h4>
                     <div className="related-movie-meta">
                       <span className="related-rating">
-                        ⭐ {movie.vote_average?.toFixed(1)}
+                        ⭐ {formatRating(movie.vote_average)}
                       </span>
                       <span className="related-year">
-                        {new Date(movie.release_date).getFullYear()}
+                        {formatYear(movie.release_date)}
                       </span>
                     </div>
                   </div>

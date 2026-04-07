@@ -4,6 +4,7 @@ import _ from "lodash";
 import "./MovieList.css";
 import MovieCard from "./MovieCard";
 import FilterGroup from "./FilterGroup";
+import { fetchMoviesByType } from "../../api/tmdb";
 
 const MovieList = ({ type, title, emoji }) => { 
   const [movies, setMovies] = useState([]);
@@ -16,7 +17,7 @@ const MovieList = ({ type, title, emoji }) => {
 
   useEffect(() => {
     fetchMovies();
-  }, []);
+  }, [type]);
 
   useEffect(() => {
     if (sort.by !== "default") {
@@ -26,10 +27,7 @@ const MovieList = ({ type, title, emoji }) => {
   }, [sort]);
 
   const fetchMovies = async () => {
-    const response = await fetch(
-      `https://api.themoviedb.org/3/movie/${type}?api_key=183928bab7fc630ed0449e4f66ec21bd`
-    );
-    const data = await response.json();
+    const data = await fetchMoviesByType(type);
     setMovies(data.results);
     setFilterMovies(data.results);
   };

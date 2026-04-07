@@ -10,8 +10,10 @@ import MovieCarousel from "./MovieCarousel/MovieCarousel";
 const Home = () => {
   return (
     <div>
-      <Navbar />
-      <MovieCarousel />
+      <div className="home-hero">
+        <Navbar />
+        <MovieCarousel />
+      </div>
       <div className="home">
         <MovieList type="popular" title="Popular" emoji={Fire} />
         <MovieList type="top_rated" title="Top Rated" emoji={Star} />

@@ -3,9 +3,8 @@
     src: url("./assets/fonts/Montserrat.woff2");
 }
 
-.app {
-    display: grid;
-    grid-template-rows: 80px auto;
+* {
+  box-sizing: border-box;
 }
 
 
@@ -14,6 +13,7 @@
   /* Dark theme (default) */
   --bg-color: #0f0f23;
   --text-color: #ffffff;
+  --app-bg: #000000;
   --navbar-bg: #1a1a2e;
   --search-bg: rgba(255, 255, 255, 0.1);
   --search-border: rgba(255, 255, 255, 0.2);
@@ -27,6 +27,7 @@
   /* Light theme */
   --bg-color: #ffffff;
   --text-color: #333333;
+  --app-bg: linear-gradient(180deg, #eef4ff 0%, #f9fbff 100%);
   --navbar-bg-light: #ffffff;
   --text-color-light: #333333;
   --search-bg-light: rgba(0, 0, 0, 0.05);
@@ -44,13 +45,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #000000;
-  color: white;
+  background: var(--app-bg);
+  color: var(--text-color);
   overflow-x: hidden;
 }
 
-[data-theme="light"] body {
-  background-color: var(--bg-color);
+#root {
+  min-height: 100vh;
+}
+
+body[data-theme="light"] {
+  background: var(--app-bg);
   color: var(--text-color);
 }
 

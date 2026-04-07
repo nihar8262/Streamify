@@ -3,6 +3,8 @@ import { Routes, Route } from 'react-router-dom'
 import Home from './components/Home' // or whatever your main page component is
 import SingleMovieCard from './components/SingleMovieCard/SingleMovieCard' // or whatever your single movie component is
 import SearchResults from './components/SearchResult/SearchResults';
+import TopGrossing from './components/TopGrossing/TopGrossing';
+import GenreExplorer from './components/GenreExplorer/GenreExplorer';
 import "./App.css";
 
 
@@ -13,6 +15,8 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/movie/:id" element={<SingleMovieCard />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/top-grossing" element={<TopGrossing />} />
+          <Route path="/genres" element={<GenreExplorer />} />
       </Routes>
   </div>
     );
