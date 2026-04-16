@@ -12,23 +12,25 @@
 }
 
 .navbar {
-    position: sticky;
-    top: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     z-index: 1100;
     width: 100%;
-    margin: 1rem auto 0;
-    padding: 0.5rem 1.25rem;
+    margin: 0;
+    padding: 0.85rem 1.25rem;
     color: white;
     transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    padding-left: 20px;
-    padding-right: 20px;
 }
 
 .navbar_brand_row {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     gap: 1rem;
+    width: min(1200px, 100%);
+    margin: 0 auto;
 }
 
 
@@ -221,9 +223,9 @@
 .navbar_menu {
     display: none;
     position: absolute;
-    top: calc(100% + 0.75rem);
-    right: 0;
-    width: calc(65% );
+    top: calc(100% + 0.25rem);
+    right: 1.25rem;
+    width: min(520px, calc(100% - 2.5rem));
     padding: 1rem 1.25rem;
     border-radius: 24px;
     overflow: hidden;
@@ -274,11 +276,10 @@
 @media (max-width: 768px) {
     .navbar {
         padding: 0.9rem 1rem;
-        width: min(100%, calc(100% - 1rem));
-        top: 0.75rem;
     }
 
     .navbar_brand_row {
+        font-size: 0.9rem;
         gap: 0.75rem;
     }
 
@@ -318,7 +319,6 @@
 @media (max-width: 480px) {
     .navbar {
         padding: 0.85rem 0.75rem;
-        width: calc(100% - 0.75rem);
     }
 
     .search_input {
@@ -333,7 +333,7 @@
     }
     
     .navbar_brand {
-        font-size: 1.1rem;
+        font-size: 0.85rem;
     }
 }
 

@@ -10,7 +10,7 @@
 .search-results-content {
     width: min(1200px, calc(100% - 2rem));
     margin: 0 auto;
-    padding-top: 1.5rem;
+    padding-top: calc(var(--navbar-height) + 1rem);
 }
 [data-theme="light"] .search-results-container {
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
@@ -217,7 +217,7 @@
 
         .search-results-content {
             width: calc(100% - 1rem);
-            padding-top: 1rem;
+            padding-top: calc(var(--navbar-height) + 0.75rem);
         }
 
         .search-header {

@@ -1,88 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React from 'react';
+import { MoonStar, SunMedium } from 'lucide-react';
 
-import "./DarkMode.css";
+import { useAppContext } from '../../context/AppContext';
 
-const DarkMode = () => {
-    const [isDarkMode, setIsDarkMode] = useState(true);
+const DarkMode = ({ compact = false, iconOnly = false }) => {
+  const { theme, toggleTheme } = useAppContext();
+  const isDarkMode = theme === 'dark';
+  const shouldShowLabel = !compact && !iconOnly;
 
-    const setDarkTheme = () => {
-        document.body.setAttribute("data-theme", "dark");
-        localStorage.setItem("selectedTheme", "dark");
-    };
-
-    const setLightTheme = () => {
-        document.body.setAttribute("data-theme", "light");
-        localStorage.setItem("selectedTheme", "light");
-    };
-
-    useEffect(() => {
-        const selectedTheme = localStorage.getItem("selectedTheme");
-        const nextIsDarkMode = selectedTheme !== "light";
-        setIsDarkMode(nextIsDarkMode);
-
-        if (nextIsDarkMode) {
-            setDarkTheme();
-        } else {
-            setLightTheme();
-        }
-    }, []);
-
-    const toggleTheme = (e) => {
-        if (e.target.checked) {
-            setDarkTheme();
-            setIsDarkMode(true);
-        } else {
-            setLightTheme();
-            setIsDarkMode(false);
-        }
-    };
-
-    return (
-        <div className='dark_mode'>
-            <label className='bb8-toggle' htmlFor='darkmode-toggle'>
-                <input
-                    className='bb8-toggle__checkbox'
-                    type='checkbox'
-                    id='darkmode-toggle'
-                    onChange={toggleTheme}
-                    checked={isDarkMode}
-                />
-
-                <div className='bb8-toggle__container'>
-                    <div className='bb8-toggle__scenery'>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='bb8-toggle__star'></div>
-                        <div className='tatto-1'></div>
-                        <div className='tatto-2'></div>
-                        <div className='gomrassen'></div>
-                        <div className='hermes'></div>
-                        <div className='chenini'></div>
-                        <div className='bb8-toggle__cloud'></div>
-                        <div className='bb8-toggle__cloud'></div>
-                        <div className='bb8-toggle__cloud'></div>
-                    </div>
-
-                    <div className='bb8'>
-                        <div className='bb8__head-container'>
-                            <div className='bb8__antenna'></div>
-                            <div className='bb8__antenna'></div>
-                            <div className='bb8__head'></div>
-                        </div>
-                        <div className='bb8__body'></div>
-                    </div>
-
-                    <div className='artificial__hidden'>
-                        <div className='bb8__shadow'></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-    );
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      className={`group relative inline-flex h-11 items-center overflow-hidden rounded-full border border-white/10 bg-slate-950 text-sm font-medium text-white shadow-lg transition duration-300 hover:scale-[1.02] hover:bg-slate-900 active:scale-[0.98] dark:bg-white/10 dark:hover:bg-white/15 ${compact ? 'w-full justify-center px-0' : iconOnly ? 'w-10 justify-center px-0' : 'gap-2 px-4'}`}
+    >
+      <span className="absolute inset-0 bg-gradient-to-r from-accent/30 via-transparent to-accent/20 opacity-0 transition duration-300 group-hover:opacity-100" />
+      <span className="relative inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/10">
+        {isDarkMode ? <MoonStar className="h-4 w-4" /> : <SunMedium className="h-4 w-4" />}
+      </span>
+      {shouldShowLabel && <span className="relative hidden sm:inline">{isDarkMode ? 'Dark' : 'Light'}</span>}
+    </button>
+  );
 };
 
 export default DarkMode;

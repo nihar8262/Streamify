@@ -39,6 +39,8 @@ export const fetchMovieDetails = (id) => request('/movie/details', { id });
 
 export const fetchMovieVideos = (id) => request('/movie/videos', { id });
 
+export const fetchMovieCredits = (id) => request('/movie/credits', { id });
+
 export const fetchSimilarMovies = (id, page = 1) => request('/movie/similar', { id, page });
 
 export const fetchGenres = () => request('/genres');

@@ -3,7 +3,7 @@
 }
 
 .home-hero .movie-carousel {
-  margin-top: -6.5rem;
+  margin-top: 0;
 }
 
 .home {
@@ -39,7 +39,7 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .home-hero .movie-carousel {
-    margin-top: -6rem;
+    margin-top: 0;
   }
 
   .home {
@@ -58,7 +58,7 @@
 
 @media (max-width: 480px) {
   .home-hero .movie-carousel {
-    margin-top: -5.5rem;
+    margin-top: 0;
   }
 
   .home {

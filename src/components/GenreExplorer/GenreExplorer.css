@@ -17,7 +17,7 @@
 .genre-shell {
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 2rem 0 3rem;
+  padding: calc(var(--navbar-height) + 1rem) 0 3rem;
 }
 
 .genre-hero h1 {

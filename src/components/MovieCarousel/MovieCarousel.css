@@ -280,7 +280,7 @@
 
 .thumbnail-title {
   color: white;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   margin: 0;
   text-align: center;
@@ -334,6 +334,10 @@
 @media (max-width: 768px) {
   .carousel-container {
     min-height: 620px;
+  }
+
+  .thumbnail-title{
+    font-size: 0.5rem;
   }
   
   .carousel-content {
@@ -408,6 +412,10 @@
 @media (max-width: 480px) {
   .carousel-container {
     min-height: 560px;
+  }
+
+  .thumbnail-title{
+    font-size: 0.35rem;
   }
   
   .carousel-movie-title {

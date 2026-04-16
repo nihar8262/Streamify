@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Check, Play, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './MovieCarousel.css';
+
 import { fetchMoviesByType } from '../../api/tmdb';
+import { useAppContext } from '../../context/AppContext';
+import { formatFullDate, formatRating, formatYear, getImageUrl, trimOverview } from '../../lib/movieUtils';
 
 const MovieCarousel = () => {
   const [upcomingMovies, setUpcomingMovies] = useState([]);
@@ -9,6 +12,7 @@ const MovieCarousel = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { isSaved, toggleWatchlist } = useAppContext();
 
   useEffect(() => {
     fetchUpcomingMovies();
@@ -62,144 +66,154 @@ const MovieCarousel = () => {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'Coming Soon';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    return formatFullDate(dateString);
   };
 
   if (loading) {
     return (
-      <div className="carousel-loading">
-        <div className="carousel-spinner"></div>
-        <p>Loading upcoming movies...</p>
-      </div>
+      <section className="relative overflow-hidden rounded-[24px] border border-white/10 bg-slate-200/80 p-4 shadow-soft dark:bg-white/5 dark:shadow-none sm:rounded-[28px] sm:p-6 lg:rounded-[32px] lg:p-8">
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer dark:via-white/10" />
+        <div className="relative grid gap-8 lg:grid-cols-[1.2fr_320px]">
+          <div className="space-y-4">
+            <div className="h-4 w-32 rounded-full bg-white/50 dark:bg-white/10" />
+            <div className="h-14 w-4/5 rounded-3xl bg-white/50 dark:bg-white/10" />
+            <div className="h-5 w-full rounded-full bg-white/50 dark:bg-white/10" />
+            <div className="h-5 w-3/4 rounded-full bg-white/50 dark:bg-white/10" />
+            <div className="flex gap-3 pt-4">
+              <div className="h-12 w-32 rounded-full bg-white/60 dark:bg-white/10" />
+              <div className="h-12 w-32 rounded-full bg-white/60 dark:bg-white/10" />
+            </div>
+          </div>
+          <div className="hidden rounded-[28px] bg-white/40 dark:bg-white/10 lg:block" />
+        </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="carousel-loading">
-        <h3>Error loading movies</h3>
-        <p>{error}</p>
-        <button onClick={fetchUpcomingMovies}>Try Again</button>
-      </div>
+      <section className="rounded-[24px] border border-red-400/20 bg-red-500/10 p-5 text-white shadow-soft sm:rounded-[28px] sm:p-6">
+        <h3 className="text-lg font-semibold">Error loading hero</h3>
+        <p className="mt-2 text-sm text-red-100/80">{error}</p>
+        <button
+          type="button"
+          onClick={fetchUpcomingMovies}
+          className="mt-4 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-slate-100 active:scale-[0.98]"
+        >
+          Try again
+        </button>
+      </section>
     );
   }
 
   if (upcomingMovies.length === 0) {
     return (
-      <div className="carousel-loading">
-        <p>No upcoming movies available</p>
-      </div>
+      <section className="rounded-[24px] border border-white/10 bg-white/60 p-6 text-center shadow-soft dark:bg-white/5 dark:text-white dark:shadow-none sm:rounded-[28px] sm:p-8">
+        No upcoming movies available
+      </section>
     );
   }
 
   const currentMovie = upcomingMovies[currentIndex];
+  const saved = isSaved(currentMovie.id);
 
   return (
-    <section className="movie-carousel">
-
-      <div className="carousel-container">
-        <div 
-          className="carousel-backdrop"
-          style={{
-            backgroundImage: currentMovie?.backdrop_path 
-              ? `url(https://image.tmdb.org/t/p/original${currentMovie.backdrop_path})`
-              : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-          }}
-        >
-          <div className="carousel-overlay"></div>
-        </div>
-
-        <div className="carousel-content">
-          <div className="carousel-movie-info">
-            <h1 className="carousel-movie-title">{currentMovie?.title || 'Unknown Title'}</h1>
-            <div className="carousel-movie-meta">
-              <span className="carousel-release-date">
-                📅 {formatDate(currentMovie?.release_date)}
-              </span>
-              <span className="carousel-rating">
-                ⭐ {currentMovie?.vote_average?.toFixed(1) || 'N/A'}/10
-              </span>
-            </div>
-            <p className="carousel-overview">
-              {currentMovie?.overview ? (
-                currentMovie.overview.length > 150 
-                  ? currentMovie.overview.substring(0, 150) + '...'
-                  : currentMovie.overview
-              ) : 'No overview available.'}
-            </p>
-            <button 
-              className="carousel-watch-button"
-              onClick={() => handleMovieClick(currentMovie?.id)}
-            >
-              View Details
-            </button>
-          </div>
-
-          <div className="carousel-poster">
-            {currentMovie?.poster_path ? (
-              <img 
-                src={`https://image.tmdb.org/t/p/w500${currentMovie.poster_path}`}
-                alt={currentMovie?.title}
-                className="carousel-poster-image"
-              />
-            ) : (
-              <div className="carousel-poster-placeholder">
-                <span>No Image</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Navigation Arrows */}
-        <button className="carousel-nav carousel-nav-prev" onClick={goToPrevious}>
-          ❮
-        </button>
-        <button className="carousel-nav carousel-nav-next" onClick={goToNext}>
-          ❯
-        </button>
-
-        {/* Dots Indicator */}
-        <div className="carousel-dots">
-          {upcomingMovies.map((_, index) => (
-            <button
-              key={index}
-              className={`carousel-dot ${index === currentIndex ? 'active' : ''}`}
-              onClick={() => goToSlide(index)}
-            />
-          ))}
-        </div>
+    <section className="relative overflow-hidden rounded-[24px] border border-white/10 bg-black text-white shadow-glow sm:rounded-[28px] lg:rounded-[32px]">
+      <div className="absolute inset-0">
+        {getImageUrl(currentMovie?.backdrop_path, 'original') ? (
+          <img
+            src={getImageUrl(currentMovie.backdrop_path, 'original')}
+            alt={currentMovie?.title}
+            className="h-full w-full object-cover blur-0 sm:blur-[1px]"
+          />
+        ) : (
+          <div className="h-full w-full bg-gradient-to-br from-accent to-fuchsia-500" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/15 to-accent/15" />
       </div>
 
-      {/* Movie Thumbnails */}
-      <div className="carousel-thumbnails">
-        {upcomingMovies.map((movie, index) => (
-          <div
-            key={movie.id}
-            className={`carousel-thumbnail ${index === currentIndex ? 'active' : ''}`}
-            onClick={() => goToSlide(index)}
+      <div className="relative grid min-h-[390px] gap-6 px-4 pb-5 pt-32 sm:min-h-[500px] sm:px-6 sm:py-7 lg:min-h-[580px] lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-8 lg:px-10 lg:py-12">
+        <div className="flex flex-col justify-end gap-[14px] pt-10 lg:gap-5 lg:pt-0">
+          <div className="inline-flex w-fit items-center rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.26em] text-accentSoft backdrop-blur sm:px-3 sm:text-xs">
+            New Release
+          </div>
+
+          <div className="space-y-3 animate-fade-up sm:space-y-4">
+            <h1 className="max-w-3xl text-[1.25rem] font-semibold leading-none sm:text-5xl lg:text-6xl">{currentMovie?.title || 'Unknown Title'}</h1>
+            <div className="hidden flex-wrap gap-2 text-[11px] text-white/80 sm:flex sm:gap-3 sm:text-sm">
+              <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1.5 backdrop-blur sm:px-3 sm:py-2">📅 {formatYear(currentMovie?.release_date)}</span>
+              <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1.5 backdrop-blur sm:px-3 sm:py-2">⭐ {formatRating(currentMovie?.vote_average)}</span>
+              <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1.5 backdrop-blur sm:px-3 sm:py-2">🔥 Trending</span>
+            </div>
+            <p className="hidden line-clamp-2 max-w-xl text-[13px] leading-5 text-white/75 sm:block sm:text-base sm:leading-7">{trimOverview(currentMovie?.overview, 120)}</p>
+          </div>
+
+          <div className="flex flex-wrap gap-3 pt-1 sm:pt-2">
+            <button
+              type="button"
+              onClick={() => handleMovieClick(currentMovie?.id)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2.5 text-[13px] font-semibold text-slate-950 shadow-lg transition hover:bg-slate-100 active:scale-[0.98] sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
+            >
+              <Play className="h-3.5 w-3.5 fill-current sm:h-4 sm:w-4" /> Play
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleWatchlist(currentMovie)}
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-4 py-2.5 text-[13px] font-semibold text-white backdrop-blur transition hover:bg-white/15 active:scale-[0.98] sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
+            >
+              {saved ? <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> : <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />} {saved ? 'Saved' : 'Watchlist'}
+            </button>
+          </div>
+        </div>
+
+        <div className="hidden items-end justify-end lg:flex">
+          <button
+            type="button"
+            onClick={() => handleMovieClick(currentMovie?.id)}
+            className="group relative overflow-hidden rounded-[28px] border border-white/15 bg-white/10 p-3 backdrop-blur transition hover:scale-[1.02]"
           >
-            {movie.poster_path ? (
-              <img 
-                src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                alt={movie.title}
-                className="thumbnail-image"
+            {getImageUrl(currentMovie?.poster_path) ? (
+              <img
+                src={getImageUrl(currentMovie.poster_path)}
+                alt={currentMovie?.title}
+                className="h-[430px] w-[290px] rounded-[22px] object-cover transition duration-500 group-hover:scale-[1.03]"
               />
             ) : (
-              <div className="thumbnail-placeholder">
-                <span>No Image</span>
-              </div>
+              <div className="flex h-[430px] w-[290px] items-center justify-center rounded-[22px] bg-white/10 text-sm text-white/70">No poster</div>
             )}
-            <div className="thumbnail-overlay">
-              <h4 className="thumbnail-title">{movie.title}</h4>
-            </div>
+          </button>
+        </div>
+
+        <div className="col-span-full border-t border-white/10 pt-2 sm:mt-2 sm:pt-5">
+          <div className="scrollbar-none flex gap-2.5 overflow-x-auto sm:gap-3">
+            {upcomingMovies.slice(0, 8).map((movie, index) => (
+              <button
+                type="button"
+                key={movie.id}
+                onClick={() => goToSlide(index)}
+                className={`group relative h-[3.9rem] w-28 shrink-0 overflow-hidden rounded-[18px] border transition sm:h-20 sm:w-36 sm:rounded-2xl ${index === currentIndex ? 'border-accent shadow-glow' : 'border-white/10 opacity-80 hover:opacity-100'}`}
+              >
+                {getImageUrl(movie.backdrop_path || movie.poster_path, 'w500') ? (
+                  <img
+                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w500')}
+                    alt={movie.title}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-white/10" />
+                )}
+                <div className="absolute inset-0 bg-black/35" />
+                <span className="absolute bottom-1.5 left-1.5 right-1.5 truncate text-left text-[10px] font-medium text-white sm:bottom-2 sm:left-2 sm:right-2 sm:text-xs">{movie.title}</span>
+              </button>
+            ))}
           </div>
-        ))}
+
+          <div className="mt-3 flex items-center justify-end gap-2">
+            <button type="button" onClick={goToPrevious} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm backdrop-blur transition hover:bg-white/15 active:scale-[0.98] sm:h-10 sm:w-10 sm:text-base">❮</button>
+            <button type="button" onClick={goToNext} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm backdrop-blur transition hover:bg-white/15 active:scale-[0.98] sm:h-10 sm:w-10 sm:text-base">❯</button>
+          </div>
+        </div>
       </div>
     </section>
   );

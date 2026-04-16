@@ -91,6 +91,15 @@ app.get('/api/movie/videos', async (req, res) => {
   await sendTmdbRequest(res, `/movie/${req.query.id}/videos`);
 });
 
+app.get('/api/movie/credits', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Movie id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/movie/${req.query.id}/credits`);
+});
+
 app.get('/api/movie/similar', async (req, res) => {
   if (!req.query.id) {
     res.status(400).json({ error: 'Movie id is required.' });
@@ -123,6 +132,10 @@ app.get('/api/movie/:id/similar', async (req, res) => {
 
 app.get('/api/movie/:id/videos', async (req, res) => {
   await sendTmdbRequest(res, `/movie/${req.params.id}/videos`);
+});
+
+app.get('/api/movie/:id/credits', async (req, res) => {
+  await sendTmdbRequest(res, `/movie/${req.params.id}/credits`);
 });
 
 app.get('/api/movie/:id', async (req, res) => {
