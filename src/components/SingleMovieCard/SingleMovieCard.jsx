@@ -14,6 +14,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
+  fetchMovieCollection,
   fetchMovieCredits,
   fetchMovieDetails,
   fetchMovieVideos,
@@ -41,6 +42,27 @@ const selectTrailer = (videos) => {
     || null;
 };
 
+const sortCollectionMovies = (movies) => movies
+  .slice()
+  .sort((leftMovie, rightMovie) => {
+    const leftDate = new Date(leftMovie.release_date || 0).getTime() || 0;
+    const rightDate = new Date(rightMovie.release_date || 0).getTime() || 0;
+    return leftDate - rightDate;
+  });
+
+const mergeUniqueMovies = (...movieGroups) => {
+  const seenMovieIds = new Set();
+
+  return movieGroups.flat().filter((movie) => {
+    if (!movie?.id || seenMovieIds.has(movie.id)) {
+      return false;
+    }
+
+    seenMovieIds.add(movie.id);
+    return true;
+  });
+};
+
 const SingleMovieCard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -54,6 +76,8 @@ const SingleMovieCard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMoreMovies, setHasMoreMovies] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [recommendationMode, setRecommendationMode] = useState('similar');
+  const [collectionName, setCollectionName] = useState('');
 
   useEffect(() => {
     const loadMovie = async () => {
@@ -61,19 +85,46 @@ const SingleMovieCard = () => {
         setLoading(true);
         setError(null);
 
-        const [details, videosResponse, creditsResponse, similarResponse] = await Promise.all([
+        const [details, videosResponse, creditsResponse] = await Promise.all([
           fetchMovieDetails(id),
           fetchMovieVideos(id),
           fetchMovieCredits(id),
-          fetchSimilarMovies(id, 1),
         ]);
+
+        let nextCollectionMovies = [];
+        let nextSimilarMovies = [];
+        let nextRecommendationMode = 'similar';
+        let nextCollectionName = '';
+        let nextHasMoreMovies = false;
+
+        if (details.belongs_to_collection?.id) {
+          const collectionResponse = await fetchMovieCollection(details.belongs_to_collection.id);
+          const collectionParts = sortCollectionMovies(collectionResponse.parts || [])
+            .filter((movie) => movie.id !== details.id);
+
+          if (collectionParts.length > 0) {
+            nextCollectionMovies = collectionParts;
+            nextRecommendationMode = 'collection';
+            nextCollectionName = collectionResponse.name || details.belongs_to_collection.name || '';
+          }
+        }
+
+        const similarResponse = await fetchSimilarMovies(id, 1);
+        nextSimilarMovies = (similarResponse.results || []).filter((movie) => movie.id !== details.id);
+        nextHasMoreMovies = nextSimilarMovies.length > 0;
+
+        const nextRelatedMovies = nextCollectionMovies.length
+          ? mergeUniqueMovies(nextCollectionMovies, nextSimilarMovies)
+          : nextSimilarMovies;
 
         setMovieData(details);
         setTrailer(selectTrailer(videosResponse.results || []));
         setCast((creditsResponse.cast || []).slice(0, 10));
-        setRelatedMovies(similarResponse.results || []);
+        setRelatedMovies(nextRelatedMovies);
+        setRecommendationMode(nextRecommendationMode);
+        setCollectionName(nextCollectionName);
         setCurrentPage(1);
-        setHasMoreMovies((similarResponse.results || []).length > 0);
+        setHasMoreMovies(nextHasMoreMovies);
       } catch (requestError) {
         setError(requestError.message);
       } finally {
@@ -99,8 +150,7 @@ const SingleMovieCard = () => {
       }
 
       setRelatedMovies((currentMovies) => {
-        const existingIds = new Set(currentMovies.map((movie) => movie.id));
-        return [...currentMovies, ...nextResults.filter((movie) => !existingIds.has(movie.id))];
+        return mergeUniqueMovies(currentMovies, nextResults);
       });
       setCurrentPage(nextPage);
       setHasMoreMovies(Boolean(nextResults.length));
@@ -113,7 +163,7 @@ const SingleMovieCard = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+      <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
         <div className="relative overflow-hidden rounded-[24px] bg-slate-200 dark:bg-white/10 sm:rounded-[32px]">
           <div className="h-[420px] sm:h-[520px]" />
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer dark:via-white/10" />
@@ -143,7 +193,7 @@ const SingleMovieCard = () => {
   const saved = isSaved(movieData.id);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+    <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
       <section className="relative overflow-hidden rounded-[24px] border border-white/10 bg-black text-white shadow-glow sm:rounded-[36px]">
         <div
           className="absolute inset-0 bg-cover bg-center lg:bg-fixed"
@@ -268,10 +318,15 @@ const SingleMovieCard = () => {
 
           <div className="scrollbar-none mt-5 flex gap-3 overflow-x-auto pb-2 sm:gap-4">
             {cast.map((person) => (
-              <div key={person.cast_id || person.credit_id} className="w-[140px] shrink-0 overflow-hidden rounded-[18px] border border-white/10 bg-white/80 shadow-soft dark:bg-white/5 dark:shadow-none sm:w-[170px] sm:rounded-[24px]">
+              <button
+                type="button"
+                key={person.cast_id || person.credit_id}
+                onClick={() => navigate(`/person/${person.id}`)}
+                className="w-[140px] shrink-0 overflow-hidden rounded-[18px] border border-white/10 bg-white/80 text-left shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-glow dark:bg-white/5 dark:shadow-none sm:w-[170px] sm:rounded-[24px]"
+              >
                 <div className="aspect-[3/4] overflow-hidden bg-slate-200 dark:bg-white/10">
                   {getImageUrl(person.profile_path, 'w300') ? (
-                    <img src={getImageUrl(person.profile_path, 'w300')} alt={person.name} className="h-full w-full object-cover" />
+                    <img src={getImageUrl(person.profile_path, 'w300')} alt={person.name} className="h-full w-full object-cover transition duration-500 hover:scale-105" />
                   ) : (
                     <div className="flex h-full items-center justify-center text-sm text-slate-500 dark:text-slate-400">No image</div>
                   )}
@@ -280,7 +335,7 @@ const SingleMovieCard = () => {
                   <h3 className="line-clamp-2 text-sm font-semibold text-slate-950 dark:text-white">{person.name}</h3>
                   <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">{person.character || 'Cast member'}</p>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </section>
@@ -290,8 +345,14 @@ const SingleMovieCard = () => {
         <section className="rounded-[24px] border border-white/10 bg-white/70 p-4 shadow-soft backdrop-blur-xl dark:bg-white/5 dark:shadow-none sm:rounded-[32px] sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-slate-950 dark:text-white sm:text-2xl">Recommendations</h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">More titles with matching tone, audience, or franchise pull.</p>
+              <h2 className="text-xl font-semibold text-slate-950 dark:text-white sm:text-2xl">
+                {recommendationMode === 'collection' ? 'Franchise Titles' : 'Recommendations'}
+              </h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                {recommendationMode === 'collection'
+                  ? `Franchise entries from ${collectionName || 'the same franchise'} first, followed by other similar movies.`
+                  : 'More titles with matching tone, audience, or franchise pull.'}
+              </p>
             </div>
           </div>
 

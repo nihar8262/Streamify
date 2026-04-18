@@ -74,7 +74,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pb-28 pt-2 sm:px-6 lg:px-8 xl:pb-12">
+    <div className="mx-auto flex w-full max-w-[90%] flex-col gap-8 px-4 pb-28 pt-2 sm:px-6 lg:px-8 xl:pb-12">
       <section className="overflow-hidden rounded-[28px] border border-slate-200/70 bg-white/80 p-6 shadow-glow backdrop-blur dark:border-white/10 dark:bg-white/5">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-3">

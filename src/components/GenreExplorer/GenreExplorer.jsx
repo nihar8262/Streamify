@@ -7,7 +7,7 @@ import { readPageCache, writePageCache } from '../../lib/pageCache';
 import { formatRating, formatYear, getImageUrl } from '../../lib/movieUtils';
 
 const GENRE_CACHE_KEY = 'streamify:genre-explorer';
-const genreCache = readPageCache(GENRE_CACHE_KEY);
+const getGenreCache = () => readPageCache(GENRE_CACHE_KEY);
 
 const SORT_OPTIONS = [
   { value: 'popularity.desc', label: 'Popularity: Highest first' },
@@ -22,27 +22,34 @@ const SORT_OPTIONS = [
 
 const GenreExplorer = () => {
   const navigate = useNavigate();
-  const [genres, setGenres] = useState(genreCache?.genres || []);
-  const [selectedGenreId, setSelectedGenreId] = useState(genreCache?.selectedGenreId || '');
-  const [selectedYear, setSelectedYear] = useState(genreCache?.selectedYear || '');
-  const [selectedSort, setSelectedSort] = useState(genreCache?.selectedSort || 'popularity.desc');
-  const [currentPage, setCurrentPage] = useState(genreCache?.currentPage || 1);
-  const [movies, setMovies] = useState(genreCache?.movies || []);
-  const [totalPages, setTotalPages] = useState(genreCache?.totalPages || 1);
-  const [totalResults, setTotalResults] = useState(genreCache?.totalResults || 0);
-  const [loadingGenres, setLoadingGenres] = useState(!genreCache?.genres?.length);
-  const [loadingMovies, setLoadingMovies] = useState(!genreCache?.movies?.length);
+  const initialCacheRef = useRef(null);
+
+  if (initialCacheRef.current === null) {
+    initialCacheRef.current = getGenreCache();
+  }
+
+  const initialCache = initialCacheRef.current;
+  const [genres, setGenres] = useState(initialCache?.genres || []);
+  const [selectedGenreId, setSelectedGenreId] = useState(initialCache?.selectedGenreId || '');
+  const [selectedYear, setSelectedYear] = useState(initialCache?.selectedYear || '');
+  const [selectedSort, setSelectedSort] = useState(initialCache?.selectedSort || 'popularity.desc');
+  const [currentPage, setCurrentPage] = useState(initialCache?.currentPage || 1);
+  const [movies, setMovies] = useState(initialCache?.movies || []);
+  const [totalPages, setTotalPages] = useState(initialCache?.totalPages || 1);
+  const [totalResults, setTotalResults] = useState(initialCache?.totalResults || 0);
+  const [loadingGenres, setLoadingGenres] = useState(!initialCache?.genres?.length);
+  const [loadingMovies, setLoadingMovies] = useState(!initialCache?.movies?.length);
   const [error, setError] = useState(null);
-  const skipInitialMovieFetchRef = useRef(Boolean(genreCache?.movies?.length && genreCache?.selectedGenreId));
-  const skipInitialResetRef = useRef(Boolean(genreCache?.movies?.length && genreCache?.selectedGenreId));
+  const skipInitialMovieFetchRef = useRef(Boolean(initialCache?.movies?.length && initialCache?.selectedGenreId));
+  const skipInitialResetRef = useRef(Boolean(initialCache?.movies?.length && initialCache?.selectedGenreId));
 
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: currentYear - 1969 }, (_, index) => String(currentYear - index));
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && Number.isFinite(genreCache?.scrollY)) {
+    if (typeof window !== 'undefined' && Number.isFinite(initialCache?.scrollY)) {
       window.requestAnimationFrame(() => {
-        window.scrollTo({ top: genreCache.scrollY, behavior: 'auto' });
+        window.scrollTo({ top: initialCache.scrollY, behavior: 'auto' });
       });
     }
   }, []);
@@ -181,7 +188,7 @@ const GenreExplorer = () => {
   });
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+    <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
       <section className="rounded-[32px] border border-white/10 bg-white/70 p-6 shadow-soft backdrop-blur-xl dark:bg-white/5 dark:shadow-none">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>

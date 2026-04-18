@@ -81,7 +81,7 @@ const SearchResults = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+      <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
         <div className="space-y-4 rounded-[28px] border border-white/10 bg-white/80 p-4 shadow-soft backdrop-blur-xl dark:bg-black/40 dark:shadow-none md:sticky md:top-32 md:z-20 xl:top-6">
           <div className="h-14 rounded-2xl bg-slate-200 dark:bg-white/10" />
           <div className="flex gap-3 overflow-x-auto pb-1">
@@ -113,7 +113,7 @@ const SearchResults = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+    <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
       <section className="rounded-[32px] border border-white/10 bg-white/70 p-6 shadow-soft backdrop-blur-xl dark:bg-white/5 dark:shadow-none">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>

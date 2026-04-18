@@ -185,21 +185,27 @@ const MovieCarousel = () => {
           </button>
         </div>
 
-        <div className="col-span-full border-t border-white/10 pt-2 sm:mt-2 sm:pt-5">
-          <div className="scrollbar-none flex gap-2.5 overflow-x-auto sm:gap-3">
-            {upcomingMovies.slice(0, 8).map((movie, index) => (
+        <div className="col-span-full min-w-0 border-t border-white/10 pt-2 sm:mt-2 sm:pt-5">
+          <div className="scrollbar-none flex w-full max-w-full snap-x snap-mandatory gap-2.5 overflow-x-auto overflow-y-hidden pb-1 pr-2 [touch-action:pan-x] [-webkit-overflow-scrolling:touch] sm:gap-3">
+            {upcomingMovies.slice(0, 16).map((movie, index) => (
               <button
                 type="button"
                 key={movie.id}
                 onClick={() => goToSlide(index)}
-                className={`group relative h-[3.9rem] w-28 shrink-0 overflow-hidden rounded-[18px] border transition sm:h-20 sm:w-36 sm:rounded-2xl ${index === currentIndex ? 'border-accent shadow-glow' : 'border-white/10 opacity-80 hover:opacity-100'}`}
+                className={`group relative h-[5.8rem] w-[3.9rem] shrink-0 snap-start overflow-hidden rounded-[18px] border transition sm:h-20 sm:w-36 sm:rounded-2xl ${index === currentIndex ? 'border-accent shadow-glow' : 'border-white/10 opacity-80 hover:opacity-100'}`}
               >
-                {getImageUrl(movie.backdrop_path || movie.poster_path, 'w500') ? (
-                  <img
-                    src={getImageUrl(movie.backdrop_path || movie.poster_path, 'w500')}
-                    alt={movie.title}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
+                {getImageUrl(movie.poster_path || movie.backdrop_path, 'w500') ? (
+                  <picture className="block h-full w-full">
+                    <source
+                      media="(min-width: 640px)"
+                      srcSet={getImageUrl(movie.backdrop_path || movie.poster_path, 'w500')}
+                    />
+                    <img
+                      src={getImageUrl(movie.poster_path || movie.backdrop_path, 'w500')}
+                      alt={movie.title}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    />
+                  </picture>
                 ) : (
                   <div className="h-full w-full bg-white/10" />
                 )}
@@ -209,7 +215,7 @@ const MovieCarousel = () => {
             ))}
           </div>
 
-          <div className="mt-3 flex items-center justify-end gap-2">
+          <div className="mt-3 hidden items-center justify-end gap-2 sm:flex">
             <button type="button" onClick={goToPrevious} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm backdrop-blur transition hover:bg-white/15 active:scale-[0.98] sm:h-10 sm:w-10 sm:text-base">❮</button>
             <button type="button" onClick={goToNext} className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/10 text-sm backdrop-blur transition hover:bg-white/15 active:scale-[0.98] sm:h-10 sm:w-10 sm:text-base">❯</button>
           </div>
