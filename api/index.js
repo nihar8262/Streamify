@@ -5,20 +5,18 @@ import {
 } from '../lib/tmdb.js';
 
 const getPathname = (req) => {
-  const segments = req.query.path;
+  const route = req.query.route;
 
-  if (Array.isArray(segments) && segments.length > 0) {
-    return `/${segments.join('/')}`;
+  if (Array.isArray(route) && route.length > 0) {
+    return `/${route.join('/')}`;
   }
 
-  if (typeof segments === 'string' && segments.length > 0) {
-    return `/${segments}`;
+  if (typeof route === 'string' && route.length > 0) {
+    return `/${route}`;
   }
 
   const pathname = new URL(req.url, 'http://localhost').pathname;
-  const normalizedPath = pathname.startsWith('/api/') ? pathname.slice(4) : pathname;
-
-  return normalizedPath || '/';
+  return pathname === '/api' ? '/' : pathname.replace(/^\/api/, '') || '/';
 };
 
 const requireId = (req, res, label) => {
