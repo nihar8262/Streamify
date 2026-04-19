@@ -5,8 +5,20 @@ import {
 } from '../lib/tmdb.js';
 
 const getPathname = (req) => {
-  const url = new URL(req.url, 'http://localhost');
-  return url.pathname.replace(/^\/api/, '') || '/';
+  const segments = req.query.path;
+
+  if (Array.isArray(segments) && segments.length > 0) {
+    return `/${segments.join('/')}`;
+  }
+
+  if (typeof segments === 'string' && segments.length > 0) {
+    return `/${segments}`;
+  }
+
+  const pathname = new URL(req.url, 'http://localhost').pathname;
+  const normalizedPath = pathname.startsWith('/api/') ? pathname.slice(4) : pathname;
+
+  return normalizedPath || '/';
 };
 
 const requireId = (req, res, label) => {
