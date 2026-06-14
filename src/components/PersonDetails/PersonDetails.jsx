@@ -91,7 +91,7 @@ const PersonDetails = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+    <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-1.5 pb-28 sm:px-6 lg:px-8 xl:pb-12">
       <section className="relative overflow-hidden rounded-[24px] border border-white/10 bg-black text-white shadow-glow sm:rounded-[36px]">
         <div className="absolute inset-0">
           {getImageUrl(person.profile_path, 'original') ? (
