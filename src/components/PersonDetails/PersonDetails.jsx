@@ -65,7 +65,7 @@ const PersonDetails = () => {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+      <div className="mx-auto flex w-full max-w-[90%] flex-col gap-6 px-1.5 pb-28 sm:px-6 lg:px-8 xl:pb-12">
         <div className="relative overflow-hidden rounded-[24px] bg-slate-200 dark:bg-white/10 sm:rounded-[32px]">
           <div className="h-[420px] sm:h-[520px]" />
           <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer dark:via-white/10" />
