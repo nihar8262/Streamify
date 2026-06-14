@@ -111,6 +111,33 @@ app.get('/api/movie/similar', async (req, res) => {
   });
 });
 
+app.get('/api/movie/collection', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Collection id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/collection/${req.query.id}`);
+});
+
+app.get('/api/person/details', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Person id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/person/${req.query.id}`);
+});
+
+app.get('/api/person/movie-credits', async (req, res) => {
+  if (!req.query.id) {
+    res.status(400).json({ error: 'Person id is required.' });
+    return;
+  }
+
+  await sendTmdbRequest(res, `/person/${req.query.id}/movie_credits`);
+});
+
 app.get('/api/movies/:type', async (req, res) => {
   const { type } = req.params;
 
@@ -140,6 +167,14 @@ app.get('/api/movie/:id/credits', async (req, res) => {
 
 app.get('/api/movie/:id', async (req, res) => {
   await sendTmdbRequest(res, `/movie/${req.params.id}`);
+});
+
+app.get('/api/person/:id/movie-credits', async (req, res) => {
+  await sendTmdbRequest(res, `/person/${req.params.id}/movie_credits`);
+});
+
+app.get('/api/person/:id', async (req, res) => {
+  await sendTmdbRequest(res, `/person/${req.params.id}`);
 });
 
 app.use(express.static(distPath));

@@ -7,23 +7,30 @@ import { readPageCache, writePageCache } from '../../lib/pageCache';
 import { formatRating, formatRevenue, formatYear, getImageUrl } from '../../lib/movieUtils';
 
 const TOP_GROSSING_CACHE_KEY = 'streamify:top-grossing';
-const topGrossingCache = readPageCache(TOP_GROSSING_CACHE_KEY);
+const getTopGrossingCache = () => readPageCache(TOP_GROSSING_CACHE_KEY);
 
 const TopGrossing = () => {
   const navigate = useNavigate();
-  const [selectedYear, setSelectedYear] = useState(topGrossingCache?.selectedYear || '');
-  const [movies, setMovies] = useState(topGrossingCache?.movies || []);
-  const [loading, setLoading] = useState(!topGrossingCache?.movies?.length);
+  const initialCacheRef = useRef(null);
+
+  if (initialCacheRef.current === null) {
+    initialCacheRef.current = getTopGrossingCache();
+  }
+
+  const initialCache = initialCacheRef.current;
+  const [selectedYear, setSelectedYear] = useState(initialCache?.selectedYear || '');
+  const [movies, setMovies] = useState(initialCache?.movies || []);
+  const [loading, setLoading] = useState(!initialCache?.movies?.length);
   const [error, setError] = useState(null);
-  const skipInitialFetchRef = useRef(Boolean(topGrossingCache?.movies?.length));
+  const skipInitialFetchRef = useRef(Boolean(initialCache?.movies?.length));
 
   const currentYear = new Date().getFullYear();
   const yearOptions = Array.from({ length: currentYear - 1969 }, (_, index) => String(currentYear - index));
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && Number.isFinite(topGrossingCache?.scrollY)) {
+    if (typeof window !== 'undefined' && Number.isFinite(initialCache?.scrollY)) {
       window.requestAnimationFrame(() => {
-        window.scrollTo({ top: topGrossingCache.scrollY, behavior: 'auto' });
+        window.scrollTo({ top: initialCache.scrollY, behavior: 'auto' });
       });
     }
   }, []);

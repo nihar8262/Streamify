@@ -7,6 +7,7 @@ import TopGrossing from './components/TopGrossing/TopGrossing';
 import GenreExplorer from './components/GenreExplorer/GenreExplorer';
 import Navbar from './components/Navbar/Navbar';
 import Profile from './components/Profile/Profile';
+import PersonDetails from './components/PersonDetails/PersonDetails';
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
                     <Route element={<Navbar />}>
                         <Route path="/" element={<Home />} />
                         <Route path="/movie/:id" element={<SingleMovieCard />} />
+                        <Route path="/person/:id" element={<PersonDetails />} />
                         <Route path="/search" element={<SearchResults />} />
                         <Route path="/top-grossing" element={<TopGrossing />} />
                         <Route path="/genres" element={<GenreExplorer />} />
