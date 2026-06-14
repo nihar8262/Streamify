@@ -181,7 +181,7 @@ const GenreExplorer = () => {
   });
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-28 sm:px-6 lg:px-8 xl:pb-12">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-1.5 pb-28 sm:px-6 lg:px-8 xl:pb-12">
       <section className="rounded-[32px] border border-white/10 bg-white/70 p-6 shadow-soft backdrop-blur-xl dark:bg-white/5 dark:shadow-none">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
           <div>
